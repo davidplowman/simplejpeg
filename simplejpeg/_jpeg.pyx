@@ -32,7 +32,7 @@ cdef extern from "turbojpeg.h" nogil:
     # TJ color subsampling constants
     cdef int TJSAMP_444, TJSAMP_422, TJSAMP_420
     cdef int TJSAMP_GRAY, TJSAMP_440, TJSAMP_411
-    cdef int TJSAMP_UNKNOWN, TJ_NUMSAMP
+    cdef int TJ_NUMSAMP
 
     # TJ encoding/decoding flags
     cdef int TJFLAG_NOREALLOC, TJFLAG_FASTDCT, TJFLAG_FASTUPSAMPLE
@@ -548,7 +548,7 @@ def encode_jpeg_yuv_planes(
     cdef int height = Y.shape[0]
     cdef int width = Y.shape[1]
     cdef int strides[3]
-    cdef int colorsubsampling_ = TJSAMP_UNKNOWN
+    cdef int colorsubsampling_ = -1
     cdef unsigned char * jpegbuf = NULL
     cdef unsigned char ** jpegbufbuf = &jpegbuf
     cdef unsigned long jpegsize = 0
@@ -603,7 +603,7 @@ def encode_jpeg_yuv_planes(
         elif U.shape[1] * 2 in (width, width+1):
             colorsubsampling_ = TJSAMP_420
 
-    if colorsubsampling_ == TJSAMP_UNKNOWN:
+    if colorsubsampling_ == -1:
         raise ValueError(
             'cannot determine chroma subsampling for planes of shape '
             f'Y={Y.shape} U={U.shape} V={V.shape}'
